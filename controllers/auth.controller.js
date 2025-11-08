@@ -1,15 +1,15 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
-import { JWT_EXPIRES_IN, JWT_SECRET } from '../config/env';
-import User from '../database/models/user.model.';
+import { JWT_EXPIRES_IN, JWT_SECRET } from '../config/env.js';
+import User from '../database/models/user.model.js';
 
 
 
 export const signUp = async (req, res, next ) => {
 
-    const session = await mongoose.StartSession();
-    session.StartTransaction();
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
     try{
 
@@ -30,10 +30,15 @@ export const signUp = async (req, res, next ) => {
             email,
             password: hashedPassword
         }], { session });
+
+        await session.commitTransaction();
+        session.endSession();
         
 
         const token = jwt.sign(
-            { userId: newUser[0]._id, JWT_SECRET, expresIn: JWT_EXPIRES_IN }
+            { userId: newUser[0]._id}, 
+            JWT_SECRET,
+            { expiresIn: JWT_EXPIRES_IN }
         );
 
         res.status(201).json({
@@ -43,11 +48,11 @@ export const signUp = async (req, res, next ) => {
                 token,
                 user: newUser[0]
             }
-        })
+        });
 
 
     } catch (error) {
-        session.abortTransaction();
+        await session.abortTransaction();
         session.endSession();
         next(error);
     }   
