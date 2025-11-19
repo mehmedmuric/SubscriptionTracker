@@ -20,7 +20,7 @@ const subscriptionSchema = new mongoose.Schema({
             required: [true, 'Currency is required'],
 
         },
-        fequency: {
+        frequency: {
             type: String,
             enum: ['daily', 'weekly', 'monthly', 'yearly'],
 
